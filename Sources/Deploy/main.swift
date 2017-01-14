@@ -5,44 +5,68 @@ import HeliumLogger
 import LoggerAPI
 import CloudFoundryEnv
 
+import MySQL
 
 Log.logger = HeliumLogger()
 setbuf(stdout, nil)
 
+struct DbConfig {
+  let host: String
+  let username: String
+  let password: String
+  let port: UInt16
+  let database: String
+}
+
+let localConfig = DbConfig(host: "127.0.0.1", username: "root", password: "", port: 3306, database: "todolist")
+
+var dbConfig : DbConfig?
+
+
 
 do {
-  let host: String, username: String, password: String, port: UInt16, database: String
-
+  // ----- //
+  
   if let service = try CloudFoundryEnv.getAppEnv().getService(spec: "TodoList-MySQL") {
 
-    // let host: String, username: String, password: String, port: UInt16, database: String
+    if let creds = service.credentials {
+      // Cloud DB Config
 
-    if let credentials = service.credentials{
-      host = credentials["hostname"] as! String
-      username = credentials["username"] as! String
-      password = credentials["password"] as! String
-      port = UInt16(credentials["port"] as! String)!
-      database = credentials["name"] as! String
+      dbConfig = DbConfig(host: creds["hostname"] as! String,
+                  username: creds["username"] as! String,
+                  password: creds["password"] as! String,
+                  port: UInt16(creds["port"] as! String)!,
+                  database: creds["name"] as! String)
+
+      Log.verbose("Found Cloud DB")
     } else {
-      host = "127.0.0.1"
-      username = "root"
-      password = ""
-      port = UInt16(3306)
-      database = "todolist"
+      Log.error("Missing Service Configuration!")
     }
 
-    let options = [String : AnyObject]()
-
-    Log.verbose("Found TodoList-MySQL")
   } else {
-    host = "127.0.0.1"
-    username = "root"
-    password = ""
-    port = UInt16(3306)
-    database = "todolist"
+    dbConfig = localConfig
 
     Log.info("Could not find Bluemix MySQL service")
+    Log.info("Running Local mode")
   }
+  
 } catch CloudFoundryEnvError.InvalidValue {
   Log.error("Oops... something went wrong. Server did not start.")
+}
+
+
+
+
+
+// ----- //
+var db : MySQL.Database?
+
+if let config = dbConfig {
+  db = try MySQL.Database(
+    host:     config.host,
+    user:     config.username,
+    password: config.password,
+    database: config.database
+  )
+  // let connection = try mysql.makeConnection()
 }
