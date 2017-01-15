@@ -7,6 +7,8 @@ import CloudFoundryEnv
 
 import MySQL
 
+import WeeklyMenuKitura
+
 Log.logger = HeliumLogger()
 setbuf(stdout, nil)
 
@@ -67,9 +69,16 @@ func configureDatabase() -> MySQL.Database? {
   return db
 }
 
-
+if let db = configureDatabase(),
+  let conn = try? db.makeConnection() {
+  
+  let repo = WeeklyMenuRepository(connection: conn)
+}
 
 
 
 
 // ----- //
+
+
+
