@@ -18,6 +18,21 @@ public struct Menu {
   let imgUrl: String
 }
 
+extension Menu : DictionaryConvertible {
+  public func toDictionary() -> JSONDictionary {
+    var dict = JSONDictionary()
+    
+    dict["id"] = self.id
+    dict["title"] = self.title
+    dict["subtitle"] = self.subtitle
+    dict["description"] = self.description
+    dict["imgUrl"] = self.imgUrl
+    
+    return dict
+  }
+}
+
+
 
 public final class WeeklyMenuRepository {
   
@@ -27,10 +42,8 @@ public final class WeeklyMenuRepository {
     self.connection = connection
   }
 
-  public func findAll() -> [Menu]? {
-    guard let resultSet: [[String: Node]] = try? connection.execute("select id, title, subtitle, description, imgUrl from menu") else {
-      return nil
-    }
+  public func findAll() throws -> [Menu] {
+    let resultSet: [[String: Node]] = try connection.execute("select id, title, subtitle, description, imgUrl from menu")
     
     var menuItems = [Menu]()
     

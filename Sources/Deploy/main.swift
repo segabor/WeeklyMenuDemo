@@ -42,10 +42,10 @@ func configureDatabase() -> MySQL.Database? {
       Log.info("Running Local mode")
       
       dbConfig = (host: "127.0.0.1",
-                  username: "root",
-                  password: "",
+                  username: "menu",
+                  password: "menu",
                   port: 3306,
-                  database: "todolist")
+                  database: "menu")
     }
     
   } catch CloudFoundryEnvError.InvalidValue {
@@ -69,16 +69,24 @@ func configureDatabase() -> MySQL.Database? {
   return db
 }
 
-if let db = configureDatabase(),
-  let conn = try? db.makeConnection() {
-  
-  let repo = WeeklyMenuRepository(connection: conn)
+do {
+  if let db = configureDatabase() {
+    let conn = try db.makeConnection()
+    
+    let repo = WeeklyMenuRepository(connection: conn)
+    
+    
+    let router = Router()
+    
+    router.all("/*", middleware: BodyParser())
+    
+    let controller = WeeklyMenuController(repository: repo, router: router)
+
+    Kitura.addHTTPServer(onPort: 8080, with: router)
+    Kitura.run()
+  } else {
+    Log.error("Failed to start server")
+  }
+} catch {
+  Log.error("Failed to start server, \(error.localizedDescription)")
 }
-
-
-
-
-// ----- //
-
-
-
