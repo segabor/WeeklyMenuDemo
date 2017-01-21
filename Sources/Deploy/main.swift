@@ -69,24 +69,19 @@ func configureDatabase() -> MySQL.Database? {
   return db
 }
 
-do {
-  if let db = configureDatabase() {
-    let conn = try db.makeConnection()
-    
-    let repo = WeeklyMenuRepository(connection: conn)
-    
-    
-    let router = Router()
-    
-    router.all("/*", middleware: BodyParser())
-    
-    let controller = WeeklyMenuController(repository: repo, router: router)
+if let db = configureDatabase() {
+  
+  let repo = WeeklyMenuRepository(database: db)
+  
+  
+  let router = Router()
+  
+  router.all("/*", middleware: BodyParser())
+  
+  let controller = WeeklyMenuController(repository: repo, router: router)
 
-    Kitura.addHTTPServer(onPort: 8080, with: router)
-    Kitura.run()
-  } else {
-    Log.error("Failed to start server")
-  }
-} catch {
-  Log.error("Failed to start server, \(error.localizedDescription)")
+  Kitura.addHTTPServer(onPort: 8080, with: router)
+  Kitura.run()
+} else {
+  Log.error("Failed to start server")
 }

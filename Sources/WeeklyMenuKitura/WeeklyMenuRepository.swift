@@ -36,14 +36,14 @@ extension Menu : DictionaryConvertible {
 
 public final class WeeklyMenuRepository {
   
-  let connection: MySQL.Connection
+  let database: MySQL.Database
   
-  public init(connection: MySQL.Connection) {
-    self.connection = connection
+  public init(database: MySQL.Database) {
+    self.database = database
   }
 
   public func findAll() throws -> [Menu] {
-    let resultSet: [[String: Node]] = try connection.execute("select id, title, subtitle, description, imgUrl from menu")
+    let resultSet: [[String: Node]] = try database.execute("select id, title, subtitle, description, imgUrl from menu")
     
     var menuItems = [Menu]()
     
