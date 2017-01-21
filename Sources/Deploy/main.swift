@@ -21,7 +21,7 @@ func configureDatabase() -> MySQL.Database? {
   do {
     // ----- //
     
-    if let service = try CloudFoundryEnv.getAppEnv().getService(spec: "TodoList-MySQL") {
+    if let service = try CloudFoundryEnv.getAppEnv().getService(spec: "WeeklyMenuDB") {
       
       if let creds = service.credentials {
         // Cloud DB Config
