@@ -32,7 +32,7 @@ public final class WeeklyMenuController {
     do {
       let menuList = try repository.findAll()
 
-      let resp : JSONDictionary = ["data": ["menu": menuList.toDictionary() ] ]
+      let resp : [String:Any] = ["data": ["menu": menuList ] ]
       try response.status(.OK).send( json: JSON(resp) ).end()
     } catch {
       Log.error("Failed to fetch data from repository: \(error.localizedDescription)")

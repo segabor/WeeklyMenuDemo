@@ -10,29 +10,6 @@ import Foundation
 
 import MySQL
 
-public struct Menu {
-  let id: String
-  let title: String
-  let subtitle: String
-  let description: String
-  let imgUrl: String
-}
-
-extension Menu : DictionaryConvertible {
-  public func toDictionary() -> JSONDictionary {
-    var dict = JSONDictionary()
-    
-    dict["id"] = self.id
-    dict["title"] = self.title
-    dict["subtitle"] = self.subtitle
-    dict["description"] = self.description
-    dict["imgUrl"] = self.imgUrl
-    
-    return dict
-  }
-}
-
-
 
 public final class WeeklyMenuRepository {
   
@@ -42,10 +19,10 @@ public final class WeeklyMenuRepository {
     self.database = database
   }
 
-  public func findAll() throws -> [Menu] {
+  public func findAll() throws -> [[String:Any]] {
     let resultSet: [[String: Node]] = try database.execute("select id, title, subtitle, description, imgUrl from menu")
     
-    var menuItems = [Menu]()
+    var menuItems = [[String:Any]]()
     
     resultSet.forEach { entry in
       if
@@ -55,7 +32,7 @@ public final class WeeklyMenuRepository {
         let description = entry["description"]?.string,
         let imgUrl = entry["imgUrl"]?.string
       {
-        menuItems.append( Menu(id: id, title: title, subtitle: subtitle, description: description, imgUrl: imgUrl))
+        menuItems.append(["id": id, "title": title, "subtitle": subtitle, "description": description, "imgUrl": imgUrl])
       }
     }
     
