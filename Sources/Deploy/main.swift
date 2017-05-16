@@ -75,8 +75,8 @@ if let db = configureDatabase() {
   
   
   let router = Router()
-  
-  router.all("/*", middleware: BodyParser())
+
+  router.all("/images", middleware: StaticFileServer(path: "./images"))
   
   let controller = WeeklyMenuController(repository: repo, router: router)
 
