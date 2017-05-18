@@ -1,87 +1,36 @@
 import Foundation
 
 import Kitura
-import HeliumLogger
 import LoggerAPI
+import Configuration
 import CloudFoundryEnv
+import CloudFoundryConfig
 
 import MySQL
 
 import WeeklyMenuKitura
 
-Log.logger = HeliumLogger()
-setbuf(stdout, nil)
+public let router = Router()
+public let manager = ConfigurationManager()
+public var port: Int = 8080
 
-// --- MAIN --- //
+manager.load(file: "config.json", relativeFrom: .project)
+       .load(.environmentVariables)
 
+port = manager.port
 
-func configureDatabase() -> MySQL.Database? {
-  var dbConfig : (host: String, username: String, password: String, port: UInt16, database: String)?
+let dbConfig = try! manager.getMySQLService(name: "WeeklyMenuDB")
+let db = try! MySQL.Database(
+    host:     dbConfig.host,
+    user:     dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.database)
 
-  do {
-    // ----- //
-    
-    if let service = try CloudFoundryEnv.getAppEnv().getService(spec: "WeeklyMenuDB") {
-      
-      if let creds = service.credentials {
-        // Cloud DB Config
-        Log.verbose("Found Cloud DB")
-        
-        dbConfig = (host: creds["hostname"] as! String,
-                    username: creds["username"] as! String,
-                    password: creds["password"] as! String,
-                    port: UInt16(creds["port"] as! String)!,
-                    database: creds["name"] as! String)
-        
-      } else {
-        Log.error("Missing Cloud Service Configuration!")
-      }
-      
-    } else {
-      // Local DB Config
-      Log.info("Running Local mode")
-      
-      dbConfig = (host: "127.0.0.1",
-                  username: "menu",
-                  password: "menu",
-                  port: 3306,
-                  database: "menu")
-    }
-    
-  } catch CloudFoundryEnvError.InvalidValue {
-    Log.error("Oops... something went wrong.")
-  } catch {
-    Log.error("Something unexpected happened: \(error.localizedDescription)")
-  }
+let repo = WeeklyMenuRepository(database: db)
 
-  
-  guard
-    let config = dbConfig,
-    let db = try? MySQL.Database(
-      host:     config.host,
-      user:     config.username,
-      password: config.password,
-      database: config.database
-    ) else {
-      return nil
-  }
+router.all("/images", middleware: StaticFileServer(path: "./images"))
 
-  return db
-}
+let controller = WeeklyMenuController(repository: repo, router: router)
 
-if let db = configureDatabase() {
-  
-  let repo = WeeklyMenuRepository(database: db)
-  
-  
-  let router = Router()
-
-  router.all("/images", middleware: StaticFileServer(path: "./images"))
-  
-  let controller = WeeklyMenuController(repository: repo, router: router)
-
-  Kitura.addHTTPServer(onPort: 8080, with: router)
-  Kitura.run()
-} else {
-  Log.error("Failed to start server")
-}
+Kitura.addHTTPServer(onPort: port, with: router)
+Kitura.run()

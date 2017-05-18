@@ -16,6 +16,6 @@ let package = Package(
       .Package(url: "https://github.com/IBM-Swift/Kitura.git", majorVersion: 1),
       .Package(url: "https://github.com/IBM-Swift/HeliumLogger.git", majorVersion: 1),
       .Package(url: "https://github.com/vapor/mysql", majorVersion: 1),
-      .Package(url: "https://github.com/IBM-Swift/Swift-cfenv.git", majorVersion: 1)
+      .Package(url: "https://github.com/IBM-Swift/CloudConfiguration.git", majorVersion: 2)
     ]
 )

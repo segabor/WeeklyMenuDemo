@@ -1,0 +1,19 @@
+{
+  "vcap": {
+    "services": {
+      "mysql": [{
+        "name": "WeeklyMenuDB",
+        "label": "Local Config",
+        "credentials": {
+          "name": "menu",
+          "hostname": "127.0.0.1",
+          "username": "menu",
+          "password": "menu",
+          "port": "3306"
+        }
+      }]
+    }
+  },
+  "logger": "helium",
+  "port": "8080"
+}
