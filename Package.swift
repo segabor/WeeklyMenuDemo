@@ -4,11 +4,7 @@ let package = Package(
     name: "WeeklyMenuKitura",
     targets: [
       Target(
-        name: "Deploy",
-        dependencies: ["WeeklyMenuKitura"]
-      ),
-      Target(
-        name: "WeeklyMenuKitura"
+        name: "Deploy"
       )
     ],
 
