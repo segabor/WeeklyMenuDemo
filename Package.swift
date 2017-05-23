@@ -1,7 +1,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "WeeklyMenuKitura",
+    name: "WeeklyMenuDemo",
     targets: [
       Target(
         name: "Deploy"

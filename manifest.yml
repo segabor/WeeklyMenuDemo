@@ -3,8 +3,7 @@ declared-services:
     label: mysql
     plan: spark
 applications:
-- name: WeeklyMenuKitura 
-# path: ./TodoList-Server
+- name: WeeklyMenuDemo 
   memory: 256M
   instances: 1
   random-route: true
