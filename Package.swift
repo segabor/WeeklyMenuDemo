@@ -4,8 +4,10 @@ let package = Package(
     name: "WeeklyMenuDemo",
     targets: [
       Target(
-        name: "Deploy"
-      )
+        name: "Deploy",
+        dependencies: ["WeeklyMenuDemo"]
+      ),
+      Target(name: "WeeklyMenuDemo")
     ],
 
     dependencies: [
